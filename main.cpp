@@ -15,8 +15,8 @@ using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::system_clock;
 
-const int xres = 150;
-const int yres = 150;
+const int xres = 100;
+const int yres = 100;
 
 float scrn[xres][yres];
 
@@ -42,7 +42,7 @@ int frame(int tim, int cFrame){
             float uvy = iPosY/iResY;
 
             float col = 0.;
-            float scale = 10.;
+            float scale = 20.;
             col = 0.5 + 0.5 * ((sin(cTime+uvy*scale) + cos(cTime+uvx*scale))/2.);
 
             // col = uvy;
@@ -91,14 +91,13 @@ int frame(int tim, int cFrame){
 int main(){
     int sTime = gettime();
     int cTime;
-    for(int l = 0; l < 500; l++){
+    for(int l = 0; l < 5000; l++){
         int t = gettime();
         cTime = t - sTime;
-        cout << cTime << "\n";
 
         frame(cTime, l);
 
-        //sleep(1./2.);
+        sleep(0.8);
     }
     int eTime = gettime();
 
