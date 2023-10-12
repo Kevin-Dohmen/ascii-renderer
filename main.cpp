@@ -16,8 +16,8 @@ using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::system_clock;
 
-const int xres = 150;
-const int yres = 150;
+const int xres = 100;
+const int yres = 100;
 
 float scrn[xres][yres];
 
@@ -30,10 +30,10 @@ int gettime(){
 
 void delay(int milliseconds){
     //windows:
-    Sleep(milliseconds);
+    //Sleep(milliseconds);
 
     //Unix:
-    //uSleep(milliseconds*100);
+    usleep(milliseconds*1000);
 }
 
 int frame(int tim, int cFrame){
@@ -51,7 +51,7 @@ int frame(int tim, int cFrame){
             float uvy = iPosY/iResY;
 
             float col = 0.;
-            float scale = 10.;
+            float scale = 15.;
             
             col = 0.5 + 0.5 * ((sin(cTime+uvx*scale) + sin(cTime+uvy*scale))/2.);
 
@@ -99,7 +99,7 @@ int main(){
 
         frame(cTime, l);
 
-        delay(100);
+        delay(50);
     }
     int eTime = gettime();
 
