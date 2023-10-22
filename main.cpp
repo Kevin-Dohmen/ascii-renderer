@@ -1,8 +1,9 @@
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <chrono>
 #include <ctime>
-#include <vector>
+#include <thread>
+#include <string>
 // #include <sys/time.h>
 
 #ifdef _WIN32
@@ -11,7 +12,6 @@
 #include <unistd.h>
 #endif
 
-using namespace std;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::system_clock;
@@ -25,7 +25,7 @@ const int gradientamnt = 12;
 char gradient[gradientamnt] = {' ', '.', ':', ';', '~', '+', '*', '=', 'x', 'X', '$', '&'};
 
 int gettime(){
-    return duration_cast<milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+    return std::chrono::duration_cast<milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 void delay(int milliseconds){
@@ -33,7 +33,8 @@ void delay(int milliseconds){
     //Sleep(milliseconds);
 
     //Unix:
-    usleep(milliseconds*1000);
+    // usleep(milliseconds*1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 int frame(int tim, int cFrame){
@@ -51,24 +52,25 @@ int frame(int tim, int cFrame){
             float uvy = iPosY/iResY;
 
             float col = 0.;
-            float scale = 15.;
+            float scale = 15;
             
-            col = 0.5 + 0.5 * ((sin(cTime+uvx*scale) + sin(cTime+uvy*scale))/2.);
+            // col = 0.5 + 0.5 * sin(atan((0.5-uvx)/(0.5-uvy)));
 
+            col = 0.5 + 0.5 * ((sin(cTime+uvx*scale) + sin(cTime+uvy*scale))/2.);
 
             scrn[xpos][ypos] = float(col);
         }
     }
 
     // render
-    string framestr = "";
+    std::string framestr = "";
     for(int y = yres-1; y >= 0; y--){
-        string linestr = "";
+        std::string linestr = "";
         for(int x = 0; x < xres; x++){
             float bwval = scrn[x][y];
             float pix = 0.;
             pix = bwval;
-            if(0. <= bwval <= 1.){
+            if(bwval >= 0. && bwval <= 1.){
                 pix = bwval;
             }
             else if(bwval < 0.){
@@ -85,31 +87,31 @@ int frame(int tim, int cFrame){
         //cout << "\n";
         framestr = framestr + linestr + "\n";
     }
-    cout << framestr;
-    cout << "\n";
+    std::cout << framestr;
+    std::cout << "\n";
     return 0;
 }
 
 int main(){
     int sTime = gettime();
     int cTime;
-    for(int l = 0; l < 5000; l++){
+    for(int l = 0; l < 50000; l++){
         int t = gettime();
         cTime = t - sTime;
 
         frame(cTime, l);
 
-        delay(50);
+        delay(1000/60);
     }
     int eTime = gettime();
 
-    cout << sTime;
-    cout << "\n";
-    cout << cTime;
-    cout << "\n";
-    cout << eTime;
-    cout << "\n";
-    cout << eTime - sTime;
-    cout << "\n";
+    std::cout << sTime;
+    std::cout << "\n";
+    std::cout << cTime;
+    std::cout << "\n";
+    std::cout << eTime;
+    std::cout << "\n";
+    std::cout << eTime - sTime;
+    std::cout << "\n";
     return 0;
 }
