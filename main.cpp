@@ -5,11 +5,11 @@
 #include <thread>
 #include <string>
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
+// #ifdef _WIN32
+// #include <Windows.h>
+// #else
+// #include <unistd.h>
+// #endif
 
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
@@ -98,10 +98,10 @@ public:
     }
 };
 
-vec2 res = vec2(100, 100);
+vec2 res = vec2(50, 50);
 
-int gradientlen = 10;
-char gradient = " .:-=+*#%@";
+const int gradientlen = 10;
+char gradient[gradientlen] = {' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'};
 
 int gettime(){
     return std::chrono::duration_cast<milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -111,32 +111,47 @@ void delay(int milliseconds){
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-float shader(vec2 fragpos, vec2 fragres, float cTime){
+float shader(vec2 fragpos, vec2 fragres, float cTime, int cFrame){
     float col = 0.;
-    float scale = 10;
-    vec2 uv = fragpos / fragres;
-    
-    // col = 0.5 + 0.5 * sin(atan((0.5-uvx)/(0.5-uvy)));
+    float scale = 100;
+    vec2 uv = vec2(fragpos.x / fragres.x, fragpos.y / fragres.y);
 
-    col = 0.5 + 0.5 * ((sin(cTime+uv.x*scale) + sin(cTime+uv.y*scale))/2.);
+    col = uv.length();
+
     return col;
 }
 
-int render() {
+int render(int cFrame, int cTime) {
     std::string scrn = "";
-    for x in range(res.y-1, -1, -1):
-        std::string linestr = "";
-        for y in range(0, res.x):
-            
-        
+    for(int y = res.y; y >= 0; y--){
+        std::string line = "";
+        for(int x = 0; x < res.x; x++){
+            float col = shader(vec2(x, y), res, gettime(), cFrame);
+
+            char caracter = gradient[(int)(col * gradientlen)];
+
+            line += char(caracter);
+            line += char(caracter);
+        }
+        scrn += (line+"\n");
+    }
+    std::cout << scrn;
+    return 0;
 }
 
 int main(){
     int tim = gettime();
     int cFrame = 0;
+    int prevTime = tim;
+    float fps = 0;
     while(true){
-        
+        int cTime = gettime();
+        std::cout << "FPS: " << fps << "\n";
+        render(cFrame, cTime);
+        delay(10);
+        fps = 1000.0f / (cTime - prevTime);
         cFrame++;
+        prevTime = cTime;
     }
     return 0;
 }
