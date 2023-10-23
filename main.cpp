@@ -4,7 +4,6 @@
 #include <ctime>
 #include <thread>
 #include <string>
-// #include <sys/time.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -16,102 +15,128 @@ using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::system_clock;
 
-const int xres = 100;
-const int yres = 100;
+class vec2 {
+public:
+    float x;
+    float y;
 
-float scrn[xres][yres];
+    vec2(float x, float y) : x(x), y(y) {}
 
-const int gradientamnt = 12;
-char gradient[gradientamnt] = {' ', '.', ':', ';', '~', '+', '*', '=', 'x', 'X', '$', '&'};
+    vec2 operator+(const vec2& other) const {
+        return vec2(x + other.x, y + other.y);
+    }
+
+    vec2 operator-(const vec2& other) const {
+        return vec2(x - other.x, y - other.y);
+    }
+
+    vec2 operator*(float scalar) const {
+        return vec2(x * scalar, y * scalar);
+    }
+
+    vec2 operator/(float scalar) const {
+        return vec2(x / scalar, y / scalar);
+    }
+
+    float length() const {
+        return std::sqrt(x * x + y * y);
+    }
+
+    vec2 normalized() const {
+        float len = length();
+        return vec2(x / len, y / len);
+    }
+
+    float dot(const vec2& other) const {
+        return x * other.x + y * other.y;
+    }
+
+    float cross(const vec2& other) const {
+        return x * other.y - y * other.x;
+    }
+};
+
+class vec3 {
+public:
+    float x;
+    float y;
+    float z;
+
+    vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    vec3 operator+(const vec3& other) const {
+        return vec3(x + other.x, y + other.y, z + other.z);
+    }
+
+    vec3 operator-(const vec3& other) const {
+        return vec3(x - other.x, y - other.y, z - other.z);
+    }
+
+    vec3 operator*(float scalar) const {
+        return vec3(x * scalar, y * scalar, z * scalar);
+    }
+
+    vec3 operator/(float scalar) const {
+        return vec3(x / scalar, y / scalar, z / scalar);
+    }
+
+    float length() const {
+        return std::sqrt(x * x + y * y + z * z);
+    }
+
+    vec3 normalized() const {
+        float len = length();
+        return vec3(x / len, y / len, z / len);
+    }
+
+    float dot(const vec3& other) const {
+        return x * other.x + y * other.y + z * other.z;
+    }
+
+    vec3 cross(const vec3& other) const {
+        return vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
+    }
+};
+
+vec2 res = vec2(100, 100);
+
+int gradientlen = 10;
+char gradient = " .:-=+*#%@";
 
 int gettime(){
     return std::chrono::duration_cast<milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 void delay(int milliseconds){
-    //windows:
-    //Sleep(milliseconds);
-
-    //Unix:
-    // usleep(milliseconds*1000);
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-int frame(int tim, int cFrame){
-    for(int ypos = 0; ypos < yres; ypos++){
-        // frame constants
-        float iResX = float(xres);
-        float iResY = float(yres);
-        float cTime = tim / 1000.;
+float shader(vec2 fragpos, vec2 fragres, float cTime){
+    float col = 0.;
+    float scale = 10;
+    vec2 uv = fragpos / fragres;
+    
+    // col = 0.5 + 0.5 * sin(atan((0.5-uvx)/(0.5-uvy)));
 
-        // shader
-        for(int xpos = 0; xpos < xres; xpos++){
-            float iPosX = float(xpos);
-            float iPosY = float(ypos);
-            float uvx = iPosX/iResX;
-            float uvy = iPosY/iResY;
+    col = 0.5 + 0.5 * ((sin(cTime+uv.x*scale) + sin(cTime+uv.y*scale))/2.);
+    return col;
+}
 
-            float col = 0.;
-            float scale = 15;
-            
-            // col = 0.5 + 0.5 * sin(atan((0.5-uvx)/(0.5-uvy)));
-
-            col = 0.5 + 0.5 * ((sin(cTime+uvx*scale) + sin(cTime+uvy*scale))/2.);
-
-            scrn[xpos][ypos] = float(col);
-        }
-    }
-
-    // render
-    std::string framestr = "";
-    for(int y = yres-1; y >= 0; y--){
+int render() {
+    std::string scrn = "";
+    for x in range(res.y-1, -1, -1):
         std::string linestr = "";
-        for(int x = 0; x < xres; x++){
-            float bwval = scrn[x][y];
-            float pix = 0.;
-            pix = bwval;
-            if(bwval >= 0. && bwval <= 1.){
-                pix = bwval;
-            }
-            else if(bwval < 0.){
-                pix = 0.;
-            }
-            else{
-                pix = 1.;
-            }
-            // cout << gradient[int(floor(pix*(gradientamnt-1)))];
-            // cout << gradient[int(floor(pix*(gradientamnt-1)))];
-            linestr = linestr + gradient[int(floor(pix*(gradientamnt-1)))] + gradient[int(floor(pix*(gradientamnt-1)))];
-        }
-        //cout << linestr;
-        //cout << "\n";
-        framestr = framestr + linestr + "\n";
-    }
-    std::cout << framestr;
-    std::cout << "\n";
-    return 0;
+        for y in range(0, res.x):
+            
+        
 }
 
 int main(){
-    int sTime = gettime();
-    int cTime;
-    for(int l = 0; l < 50000; l++){
-        int t = gettime();
-        cTime = t - sTime;
-
-        frame(cTime, l);
-
-        delay(1000/60);
+    int tim = gettime();
+    int cFrame = 0;
+    while(true){
+        
+        cFrame++;
     }
-    int eTime = gettime();
-
-    std::cout << sTime;
-    std::cout << "\n";
-    std::cout << cTime;
-    std::cout << "\n";
-    std::cout << eTime;
-    std::cout << "\n";
-    std::cout << eTime - sTime;
-    std::cout << "\n";
     return 0;
 }
