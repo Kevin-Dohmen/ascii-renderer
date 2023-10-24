@@ -34,8 +34,8 @@ public:
         return vec2(x * scalar, y * scalar);
     }
 
-    vec2 operator/(float scalar) const {
-        return vec2(x / scalar, y / scalar);
+    vec2 operator/(vec2 scalar) const {
+        return vec2(x / scalar.x, y / scalar.y);
     }
 
     float length() const {
@@ -98,7 +98,7 @@ public:
     }
 };
 
-vec2 res = vec2(50, 50);
+vec2 res = vec2(100, 100);
 
 const int gradientlen = 10;
 char gradient[gradientlen] = {' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'};
@@ -112,11 +112,16 @@ void delay(int milliseconds){
 }
 
 float shader(vec2 fragpos, vec2 fragres, float cTime, int cFrame){
-    float col = 0.;
-    float scale = 100;
-    vec2 uv = vec2(fragpos.x / fragres.x, fragpos.y / fragres.y);
+    //vec2 uv = vec2(fragpos.x / fragres.x, fragpos.y / fragres.y);
+    vec2 uv = fragpos / fragres;
 
-    col = uv.length();
+    float col = 0.f;
+    float scale = 20.f;
+
+    float timfact = 0.5f;
+    float stime = cTime * 0.001 * timfact;
+    col = (sin(uv.x * scale + stime) + sin(uv.y * scale + stime))/2.0f * 0.5f + 0.5f;
+    // col = uv.length();
 
     return col;
 }
@@ -135,7 +140,7 @@ int render(int cFrame, int cTime) {
         }
         scrn += (line+"\n");
     }
-    std::cout << scrn;
+    //std::cout << scrn;
     return 0;
 }
 
@@ -146,9 +151,9 @@ int main(){
     float fps = 0;
     while(true){
         int cTime = gettime();
-        std::cout << "FPS: " << fps << "\n";
         render(cFrame, cTime);
-        delay(10);
+        std::cout << "FPS: " << fps << "\n" << "frametime: " << cTime - prevTime << "\n";
+        //delay(20);
         fps = 1000.0f / (cTime - prevTime);
         cFrame++;
         prevTime = cTime;
