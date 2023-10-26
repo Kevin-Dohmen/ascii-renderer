@@ -22,36 +22,44 @@ public:
 
     vec2(float x, float y) : x(x), y(y) {}
 
-    vec2 operator+(const vec2& other) const {
+    vec2 operator+(const vec2 &other) const
+    {
         return vec2(x + other.x, y + other.y);
     }
 
-    vec2 operator-(const vec2& other) const {
+    vec2 operator-(const vec2 &other) const
+    {
         return vec2(x - other.x, y - other.y);
     }
 
-    vec2 operator*(float scalar) const {
+    vec2 operator*(float scalar) const
+    {
         return vec2(x * scalar, y * scalar);
     }
 
-    vec2 operator/(vec2 scalar) const {
+    vec2 operator/(vec2 scalar) const
+    {
         return vec2(x / scalar.x, y / scalar.y);
     }
 
-    float length() const {
+    float length() const
+    {
         return std::sqrt(x * x + y * y);
     }
 
-    vec2 normalized() const {
+    vec2 normalized() const
+    {
         float len = length();
         return vec2(x / len, y / len);
     }
 
-    float dot(const vec2& other) const {
+    float dot(const vec2 &other) const
+    {
         return x * other.x + y * other.y;
     }
 
-    float cross(const vec2& other) const {
+    float cross(const vec2 &other) const
+    {
         return x * other.y - y * other.x;
     }
 };
@@ -64,73 +72,97 @@ public:
 
     vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
-    vec3 operator+(const vec3& other) const {
+    vec3 operator+(const vec3 &other) const
+    {
         return vec3(x + other.x, y + other.y, z + other.z);
     }
 
-    vec3 operator-(const vec3& other) const {
+    vec3 operator-(const vec3 &other) const
+    {
         return vec3(x - other.x, y - other.y, z - other.z);
     }
 
-    vec3 operator*(float scalar) const {
+    vec3 operator*(float scalar) const
+    {
         return vec3(x * scalar, y * scalar, z * scalar);
     }
 
-    vec3 operator/(float scalar) const {
+    vec3 operator/(float scalar) const
+    {
         return vec3(x / scalar, y / scalar, z / scalar);
     }
 
-    float length() const {
+    float length() const
+    {
         return std::sqrt(x * x + y * y + z * z);
     }
 
-    vec3 normalized() const {
+    vec3 normalized() const
+    {
         float len = length();
         return vec3(x / len, y / len, z / len);
     }
 
-    float dot(const vec3& other) const {
+    float dot(const vec3 &other) const
+    {
         return x * other.x + y * other.y + z * other.z;
     }
 
-    vec3 cross(const vec3& other) const {
+    vec3 cross(const vec3 &other) const
+    {
         return vec3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
     }
 };
 
-vec2 res = vec2(100, 100);
+vec2 res = vec2(50, 50);
 
 const int gradientlen = 10;
 char gradient[gradientlen] = {' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'};
 
-int gettime(){
+int gettime()
+{
     return std::chrono::duration_cast<milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-void delay(int milliseconds){
+void delay(int milliseconds)
+{
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-float shader(vec2 fragpos, vec2 fragres, float cTime, int cFrame){
-    //vec2 uv = vec2(fragpos.x / fragres.x, fragpos.y / fragres.y);
+float shader(vec2 fragpos, vec2 fragres, float cTime, int cFrame)
+{
+    // vec2 uv = vec2(fragpos.x / fragres.x, fragpos.y / fragres.y);
     vec2 uv = fragpos / fragres;
 
     float col = 0.f;
-    float scale = 20.f;
+    //float scale = 10.f;
 
     float timfact = 0.5f;
     float stime = cTime * 0.001 * timfact;
-    col = (sin(uv.x * scale + stime) + sin(uv.y * scale + stime))/2.0f * 0.5f + 0.5f;
-    // col = uv.length();
 
+    vec2 sphr = vec2(0.5f, 0.5f);
+    float sr = 0.4f;
+    float sprdist = (uv - sphr).length();
+
+    if(sprdist <= sr){
+        col = 0.1f - (sprdist / sr);
+        
+    }
+    else{
+        col = 0.f;
+    }
+    // col = uv.length();
     return col;
 }
 
-int render(int cFrame, int cTime) {
+int render(int cFrame, int cTime)
+{
     std::string scrn = "";
-    for(int y = res.y; y >= 0; y--){
+    for (int y = res.y; y >= 0; y--)
+    {
         std::string line = "";
-        for(int x = 0; x < res.x; x++){
+        for (int x = 0; x < res.x; x++)
+        {
             float col = shader(vec2(x, y), res, gettime(), cFrame);
 
             char caracter = gradient[(int)(col * gradientlen)];
@@ -138,22 +170,25 @@ int render(int cFrame, int cTime) {
             line += char(caracter);
             line += char(caracter);
         }
-        scrn += (line+"\n");
+        scrn += (line + "\n");
     }
-    //std::cout << scrn;
+    std::cout << scrn;
     return 0;
 }
 
-int main(){
+int main()
+{
     int tim = gettime();
     int cFrame = 0;
     int prevTime = tim;
     float fps = 0;
-    while(true){
+    while (true)
+    {
         int cTime = gettime();
         render(cFrame, cTime);
-        std::cout << "FPS: " << fps << "\n" << "frametime: " << cTime - prevTime << "\n";
-        //delay(20);
+        std::cout << "FPS: " << fps << "\n"
+                  << "frametime: " << cTime - prevTime << "\n";
+        delay(20);
         fps = 1000.0f / (cTime - prevTime);
         cFrame++;
         prevTime = cTime;
