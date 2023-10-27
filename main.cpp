@@ -145,8 +145,7 @@ float shader(vec2 fragpos, vec2 fragres, float cTime, int cFrame)
     float sprdist = (uv - sphr).length();
 
     if(sprdist <= sr){
-        col = 0.1f - (sprdist / sr);
-        
+        col = 1.0f - sprdist / sr;
     }
     else{
         col = 0.f;
