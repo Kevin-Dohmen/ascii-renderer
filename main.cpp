@@ -116,8 +116,8 @@ public:
 
 vec2 res = vec2(50, 50);
 
-const int gradientlen = 10;
-char gradient[gradientlen] = {' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'};
+const int gradientlen = 11;
+char gradient[gradientlen] = {' ', '.', ':', '-', '~', '=', '+', '*', '#', '%', '@'};
 
 int gettime()
 {
@@ -131,26 +131,18 @@ void delay(int milliseconds)
 
 float shader(vec2 fragpos, vec2 fragres, float cTime, int cFrame)
 {
-    // vec2 uv = vec2(fragpos.x / fragres.x, fragpos.y / fragres.y);
     vec2 uv = fragpos / fragres;
 
     float col = 0.f;
-    //float scale = 10.f;
+    float scale = 10.f;
+    float timfact = 1.0f;
 
-    float timfact = 0.5f;
     float stime = cTime * 0.001 * timfact;
 
-    vec2 sphr = vec2(0.5f, 0.5f);
-    float sr = 0.4f;
-    float sprdist = (uv - sphr).length();
+    col = 0.5 + 0.5 * ((sin(uv.x * scale + stime) + sin(uv.y * scale + stime)) * 0.5);
 
-    if(sprdist <= sr){
-        col = 1.0f - (sprdist / sr);
-    }
-    else{
-        col = 0.f;
-    }
     // col = uv.length();
+
     return col;
 }
 
