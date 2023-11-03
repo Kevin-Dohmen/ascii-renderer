@@ -5,6 +5,7 @@
         "thread": "cpp",
         "xlocale": "cpp",
         "xstring": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "new": "cpp"
     }
 }
