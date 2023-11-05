@@ -102,8 +102,8 @@ public:
     }
 };
 
-const int resx = 500;
-const int resy = 500;
+const int resx = 100;
+const int resy = 100;
 const int colamnt = 3;
 const vec2 resolution = vec2(resx, resy);
 
@@ -116,9 +116,13 @@ int writefile(float image[resx][resy][colamnt]) {
                 // std::cout << x << " " << y << " " << c << std::endl;
                 float val = image[x][y][c];
                 if(val >= 0.0f && val <= 1.0f){
-                    file << (int8_t)(val*256.0f);
-                } else {
+                    file << (int8_t)(val*255);
+                } else if(val > 1.0f){
+                    file << (int8_t)255;
+                } else if(val < 0.0f){
                     file << (int8_t)0;
+                } else {
+                    std::cout << "ERROR:\nfound strange value while writing to file: " << val << std::endl;
                 }
             }
         }
@@ -128,11 +132,15 @@ int writefile(float image[resx][resy][colamnt]) {
 }
 
 vec3 shader(vec2 fragres, vec2 fragpos){
-    vec3 col = vec3(0.0f, 0.0f, 0.0f);
+    vec3 col = vec3(0.0, 0.0f, 0.0f);
     vec2 uv = (fragpos / fragres);
+
+    // col.x = rand() % 256 / 256.0f; col.y = rand() % 256 / 256.0f; col.z = rand() % 256 / 256.0f;
+
     col.x = uv.x;
-    col.y = uv.y;
-    col.z = uv.length();
+    // col.y = uv.y;
+    // col.z = uv.length();
+
     // std::cout << col.y << std::endl;
     // std::cout << uv.x << " " << uv.y << " " << uv.length() << std::endl;
     return col;
