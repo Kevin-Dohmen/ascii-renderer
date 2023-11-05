@@ -132,12 +132,12 @@ int writefile(float image[resx][resy][colamnt]) {
 }
 
 vec3 shader(vec2 fragres, vec2 fragpos){
-    vec3 col = vec3(0.0, 0.0f, 0.0f);
+    vec3 col = vec3(0.25, 0.5f, 0.75f);
     vec2 uv = (fragpos / fragres);
 
     // col.x = rand() % 256 / 256.0f; col.y = rand() % 256 / 256.0f; col.z = rand() % 256 / 256.0f;
 
-    col.x = uv.x;
+    // col.x = uv.x;
     // col.y = uv.y;
     // col.z = uv.length();
 
